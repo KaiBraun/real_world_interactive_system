@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:party_app/entities/player.dart';
 import 'package:party_app/shared/constants.dart';
 import 'package:party_app/shared/utils.dart';
+import 'package:party_app/ui/select_drinking_level_view.dart';
 
 class AddPlayersView extends StatefulWidget {
   List<Player> currentPlayers = [];
@@ -22,29 +23,33 @@ class _AddPlayersViewState extends State<AddPlayersView> {
         color: Constants.primaryColor,
         height: Utils.getHeight(context),
         width: Utils.getWidth(context),
-        child: SizedBox(
-          width: Utils.getWidth(context) * 0.8,
-          child: Column(
-            children: [
-              SizedBox(height: Utils.getHeight(context) * 0.1),
-              Container(
-                height: Utils.getHeight(context) * 0.15,
-                color: Constants.accentColor2,
-                child: Text("Insert the players"),
-              ),
-              Expanded(
-                child: ListView.builder(
-                    itemCount: widget.currentPlayers.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      if(index == 0) {
-                        return Container();
-                      }
-                      return buildPlayerCard(widget.currentPlayers[index]);
-                    }
+        child: Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: Utils.getWidth(context) * 0.8,
+            child: Column(
+              children: [
+                SizedBox(height: Utils.getHeight(context) * 0.1),
+                Container(
+                  height: Utils.getHeight(context) * 0.15,
+                  color: Constants.accentColor2,
+                  child: Text("Insert the players"),
                 ),
-              ),
-              buildAddPlayerButton()
-            ],
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: widget.currentPlayers.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return Container();
+                        }
+                        return buildPlayerCard(widget.currentPlayers[index]);
+                      }),
+                ),
+                buildAddPlayerButton(),
+                SizedBox(height: Utils.getHeight(context) * 0.1),
+                buildNextButton()
+              ],
+            ),
           ),
         ),
       ),
@@ -75,15 +80,9 @@ class _AddPlayersViewState extends State<AddPlayersView> {
         Row(
           children: [
             ElevatedButton(
-                onPressed: () =>
-                {
-                },
-                child: AutoSizeText("Designated Player")),
+                onPressed: () => {}, child: AutoSizeText("Designated Driver")),
             ElevatedButton(
-                onPressed: () =>
-                {
-                },
-                child: AutoSizeText("Normal Player"))
+                onPressed: () => {}, child: AutoSizeText("Normal Player"))
           ],
         ),
         Divider(
@@ -96,26 +95,35 @@ class _AddPlayersViewState extends State<AddPlayersView> {
   }
 
   Widget buildAddPlayerButton() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: addPlayerController,
-          
-          ),
+    return Row(children: [
+      Expanded(
+        child: TextField(
+          controller: addPlayerController,
         ),
-        IconButton(onPressed: ()=>{
-          if(addPlayerController.text.isNotEmpty) {
-            setState(() {
-              widget.currentPlayers.add(Player(name: addPlayerController.text));
-            })
-          }
-
-        }, icon: Icon(Icons.add))
-      ]
-    );
+      ),
+      IconButton(
+          onPressed: () => {
+                if (addPlayerController.text.isNotEmpty)
+                  {
+                    setState(() {
+                      widget.currentPlayers
+                          .add(Player(name: addPlayerController.text));
+                    })
+                  }
+              },
+          icon: Icon(Icons.add))
+    ]);
   }
 
-
+  Widget buildNextButton() {
+    return ElevatedButton(
+        onPressed: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SelectDrinkingLevelView(
+                          currentPlayers: widget.currentPlayers)))
+            },
+        child: AutoSizeText("Next"));
+  }
 }
-
