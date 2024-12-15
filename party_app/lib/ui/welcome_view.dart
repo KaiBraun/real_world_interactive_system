@@ -28,41 +28,12 @@ class WelcomeView extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 80),
+            SizedBox(height: 50),
 
-            // Logo Title and Emoji
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: "Raise ",
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  WidgetSpan(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Icon(
-                        Icons.sports_bar_rounded,
-                        size: 48,
-                        color: Colors.orangeAccent,
-                      ),
-                    ),
-                  ),
-                  TextSpan(
-                    text: " your glass",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.center,
+            // Image Instead of Text
+            Image.asset(
+              'assets/images/logo.png',
+              width: 250,
             ),
 
             SizedBox(height: 50),
@@ -95,7 +66,7 @@ class WelcomeView extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 100),
+            SizedBox(height: 80),
 
             // Footer Text
             Text(
@@ -112,6 +83,12 @@ class WelcomeView extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
 
 
 
