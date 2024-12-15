@@ -1,5 +1,4 @@
 
-/**
 import 'dart:io';
 import 'dart:math';
 
@@ -164,8 +163,8 @@ void main() {
     for (var player in knightsOf3) {
       adjustedSips[player] = (adjustedSips[player] ?? 0) - (knightSips[player] ?? 0);
     }
-    int minSips = adjustedSips.values.reduce(min);
-    int maxSips = adjustedSips.values.reduce(max);
+    int minSips = adjustedSips.values.reduce((a,b)=>a<b?a:b);
+    int maxSips = adjustedSips.values.reduce((a,b)=>a>b?a:b);
     var kingOfTheCastle = adjustedSips.entries.where((entry) => entry.value == minSips).map((entry) => entry.key).toList();
     var houseElf = adjustedSips.entries.where((entry) => entry.value == maxSips).map((entry) => entry.key).toList();
 
@@ -202,4 +201,3 @@ void main() {
   // End of game
   print('\nGame Over!');
 }
-    **/

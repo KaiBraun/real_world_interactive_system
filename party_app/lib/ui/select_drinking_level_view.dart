@@ -55,7 +55,6 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
   }
 
   Widget buildPlayerCard(Player player) {
-    //TODO: show player name and dropdown with drinking level
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -89,7 +88,7 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
         ElevatedButton(
             onPressed: () => {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => RoleDiceView()))
+                      MaterialPageRoute(builder: (context) => RoleDiceView(players: widget.currentPlayers,)))
                 },
             child: AutoSizeText("Start Game"))
       ],
