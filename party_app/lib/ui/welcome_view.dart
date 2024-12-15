@@ -20,6 +20,7 @@ class WelcomeView extends StatelessWidget {
               child: Text(
                 "Warning: This game may cause questionable life choices!",
                 style: TextStyle(
+                  fontFamily: 'SofadiOne',
                   fontSize: 16,
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.w600,
@@ -59,6 +60,7 @@ class WelcomeView extends StatelessWidget {
               child: Text(
                 "Start",
                 style: TextStyle(
+                  fontFamily: 'SofadiOne',
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -72,6 +74,7 @@ class WelcomeView extends StatelessWidget {
             Text(
               "Life’s too short for boring parties!",
               style: TextStyle(
+                fontFamily: 'SofadiOne',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontStyle: FontStyle.italic,
