@@ -129,7 +129,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
             ),
             ElevatedButton(
               onPressed: () => {},
-              child: AutoSizeText("Normal Player"),
+              child: AutoSizeText("True Player"),
             ),
           ],
         ),
@@ -147,36 +147,56 @@ class _AddPlayersViewState extends State<AddPlayersView> {
         Expanded(
           child: TextField(
             controller: addPlayerController,
+            decoration: InputDecoration(
+              hintText: 'Enter player name',  // Optional: Hint text for better UX
+            ),
           ),
         ),
         IconButton(
           onPressed: () {
             if (addPlayerController.text.isNotEmpty) {
               setState(() {
-                widget.currentPlayers
-                    .add(Player(name: addPlayerController.text));
+                // Add player without clearing the input field
+                widget.currentPlayers.add(Player(name: addPlayerController.text));
+                // Don't clear the input field, so the first name stays
               });
             }
           },
           icon: Icon(Icons.add),
-        )
+        ),
       ],
     );
   }
 
   Widget buildNextButton() {
     return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SelectDrinkingLevelView(
-              currentPlayers: widget.currentPlayers,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              elevation: 3,
             ),
-          ),
-        );
-      },
-      child: AutoSizeText("Next"),
-    );
-  }
-}
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SelectDrinkingLevelView(
+                    currentPlayers: widget.currentPlayers,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              "Next",
+              style: TextStyle(
+                fontFamily: 'SofadiOne',
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          );
+        }
+      }
