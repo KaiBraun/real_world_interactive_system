@@ -23,32 +23,79 @@ class _AddPlayersViewState extends State<AddPlayersView> {
         color: Constants.primaryColor,
         height: Utils.getHeight(context),
         width: Utils.getWidth(context),
-        child: Align(
-          alignment: Alignment.center,
-          child: Container(
-            width: Utils.getWidth(context) * 0.8,
-            child: Column(
-              children: [
-                SizedBox(height: Utils.getHeight(context) * 0.1),
-                Container(
-                  height: Utils.getHeight(context) * 0.15,
-                  color: Constants.accentColor2,
-                  child: Text("Insert the players"),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: widget.currentPlayers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index == 0) {
-                          return Container();
-                        }
-                        return buildPlayerCard(widget.currentPlayers[index]);
-                      }),
-                ),
-                buildAddPlayerButton(),
-                SizedBox(height: Utils.getHeight(context) * 0.1),
-                buildNextButton()
-              ],
+        child: SingleChildScrollView(
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 300,
+              child: Column(
+                children: [
+                  SizedBox(height: Utils.getHeight(context) * 0.1),
+                  Container(
+                    height: 200,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,  // Centers the row content
+                          crossAxisAlignment: CrossAxisAlignment.center, // Vertically aligns the content
+                          children: [
+                            Column(  // Wrap text inside a column to keep 'Insert the' and 'players' stacked vertically
+                              mainAxisSize: MainAxisSize.min, // Prevents the column from taking unnecessary height
+                              children: [
+                                Text(
+                                  'Insert the',
+                                  style: TextStyle(
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Lemon',
+                                    color: Colors.black,
+                                    height: 1,
+                                  ),
+                                ),
+                                Text(
+                                  'players',
+                                  style: TextStyle(
+                                    fontSize: 46,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Lemon',
+                                    color: Colors.black,
+                                    height: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Align(
+                              alignment: Alignment.center, // Default alignment (middle)
+                              child: Image.asset(
+                                'assets/images/insertplayers2.png',
+                                width: 85,
+                                height: 85,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: widget.currentPlayers.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index == 0) {
+                        return Container();
+                      }
+                      return buildPlayerCard(widget.currentPlayers[index]);
+                    },
+                  ),
+                  buildAddPlayerButton(),
+                  SizedBox(height: Utils.getHeight(context) * 0.1),
+                  buildNextButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -57,73 +104,79 @@ class _AddPlayersViewState extends State<AddPlayersView> {
   }
 
   Widget buildPlayerCard(Player player) {
-    //Player testPlayer =  Player(name: "Test", driver: false);
     return Column(
       children: [
         Row(
           children: [
             Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(shape: BoxShape.circle),
               child: Icon(
-                Icons.person, // Replace with your desired icon
-                color: Colors.white, // Icon color
-                size: 50, // Icon size
+                Icons.person,
+                color: Colors.white,
+                size: 30,
               ),
             ),
-            Text(player.name)
+            Text(player.name),
           ],
         ),
         Row(
           children: [
             ElevatedButton(
-                onPressed: () => {}, child: AutoSizeText("Designated Driver")),
+              onPressed: () => {},
+              child: AutoSizeText("Designated Driver"),
+            ),
             ElevatedButton(
-                onPressed: () => {}, child: AutoSizeText("Normal Player"))
+              onPressed: () => {},
+              child: AutoSizeText("Normal Player"),
+            ),
           ],
         ),
         Divider(
           color: Colors.black,
           thickness: 2,
-          //height: 0,
         )
       ],
     );
   }
 
   Widget buildAddPlayerButton() {
-    return Row(children: [
-      Expanded(
-        child: TextField(
-          controller: addPlayerController,
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: addPlayerController,
+          ),
         ),
-      ),
-      IconButton(
-          onPressed: () => {
-                if (addPlayerController.text.isNotEmpty)
-                  {
-                    setState(() {
-                      widget.currentPlayers
-                          .add(Player(name: addPlayerController.text));
-                    })
-                  }
-              },
-          icon: Icon(Icons.add))
-    ]);
+        IconButton(
+          onPressed: () {
+            if (addPlayerController.text.isNotEmpty) {
+              setState(() {
+                widget.currentPlayers
+                    .add(Player(name: addPlayerController.text));
+              });
+            }
+          },
+          icon: Icon(Icons.add),
+        )
+      ],
+    );
   }
 
   Widget buildNextButton() {
     return ElevatedButton(
-        onPressed: () => {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SelectDrinkingLevelView(
-                          currentPlayers: widget.currentPlayers)))
-            },
-        child: AutoSizeText("Next"));
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectDrinkingLevelView(
+              currentPlayers: widget.currentPlayers,
+            ),
+          ),
+        );
+      },
+      child: AutoSizeText("Next"),
+    );
   }
 }

@@ -80,6 +80,9 @@ flutter:
     - family : SofadiOne
       fonts:
          - asset: assets/SofadiOne-Regular.ttf
+    - family : Lemon
+      fonts:
+        - asset: assets/Lemon-Regular.ttf
 
 
   #       - asset: fonts/Schyler-Italic.ttf

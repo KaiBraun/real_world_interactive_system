@@ -32,9 +32,52 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
               children: [
                 SizedBox(height: Utils.getHeight(context) * 0.1),
                 Container(
-                  height: Utils.getHeight(context) * 0.15,
-                  color: Constants.accentColor2,
-                  child: Text("Level of responsibility"),
+                  height: 200,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,  // Centers the row content
+                        crossAxisAlignment: CrossAxisAlignment.center, // Vertically aligns the content
+                        children: [
+                          Column(  // Wrap text inside a column to keep 'Insert the' and 'players' stacked vertically
+                            mainAxisSize: MainAxisSize.min, // Prevents the column from taking unnecessary height
+                            children: [
+                              Text(
+                                'Level of',
+                                style: TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Lemon',
+                                  color: Colors.black,
+                                  height: 1,
+                                ),
+                              ),
+                              Text(
+                                'Responsability',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Lemon',
+                                  color: Colors.black,
+                                  height: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 10),
+                          Align(
+                            alignment: Alignment.center, // Default alignment (middle)
+                            child: Image.asset(
+                              'assets/images/insertplayers2.png',
+                              width: 85,
+                              height: 85,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
                     child: ListView.builder(
