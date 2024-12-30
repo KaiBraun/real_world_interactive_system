@@ -70,8 +70,8 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
                             alignment: Alignment.center, // Default alignment (middle)
                             child: Image.asset(
                               'assets/images/insertplayers2.png',
-                              width: 85,
-                              height: 85,
+                              width: 65,
+                              height: 65,
                             ),
                           ),
                         ],

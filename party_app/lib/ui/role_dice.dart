@@ -39,8 +39,10 @@ class _RoleDiceState extends State<RoleDiceView> {
 
 
 
+
   @override
   Widget build(BuildContext context) {
+    GameHandler handler = GameHandler(players: widget.players);
     return Scaffold(
       body: Container(
         color: Constants.primaryColor,
@@ -60,13 +62,23 @@ class _RoleDiceState extends State<RoleDiceView> {
                       die2Value = diceResult[1];
                       sum = diceResult[2];
                     });
-                    if (counter >= 500) {
+                    if (counter >= 100) {
                       timer.cancel();
                       setState(() {
                         counter = 1;
                       });
+                      //handler.handleSips(die1Value, die2Value, context);
+                      //handler.handleKnights(die1Value, die2Value, context);
+
+                      List<String> popups = [
+                        "This is the first popup.",
+                        "Here's the second popup.",
+                        "Finally, the last popup!"
+                      ];
+                      showPopups(context, popups,0);
                     }
-                  })
+                  }),
+
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -88,9 +100,7 @@ class _RoleDiceState extends State<RoleDiceView> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 60,
-              ),
+              SizedBox(height: Utils.getHeight(context)*0.1,),
             ],
           ),
         ),
@@ -98,3 +108,37 @@ class _RoleDiceState extends State<RoleDiceView> {
     );
   }
 }
+
+
+
+Future<void> showPopups(BuildContext context, List<String> messages, int index) async {
+  // Base case: Stop when all popups are shown
+  if (index >= messages.length) return;
+
+  // Show the current popup
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Popup ${index + 1}"),
+        content: Text(messages[index]),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the current popup
+            },
+            child: Text("Next"),
+          ),
+        ],
+      );
+    },
+  );
+
+  // Add a brief pause after the current popup is dismissed
+  await Future.delayed(const Duration(milliseconds: 500));
+
+  // Show the next popup recursively
+  await showPopups(context, messages, index + 1);
+}
+
+
