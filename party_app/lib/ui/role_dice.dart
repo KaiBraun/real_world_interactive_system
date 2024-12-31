@@ -27,6 +27,7 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
   int sum = 0;
   List<String> gameEvents = [];
   int currentPlayerIndex = 0;
+  int consecutiveThrows = 0;
 
   @override
   void initState() {
@@ -56,10 +57,13 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
             retainTurn = true;
           } else if (sum == 7) {
             eventMessage += " Previous player drinks!";
+            retainTurn = true;
           } else if (sum == 8) {
             eventMessage += " Everyone drinks!";
+            retainTurn = true;
           } else if (sum == 9) {
             eventMessage += " Next player drinks!";
+            retainTurn = true;
           }
 
           gameEvents.add(eventMessage);
@@ -67,9 +71,57 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
             gameEvents.removeAt(0);
           }
 
-          // Pass turn if not retaining
-          if (!retainTurn) {
+          // Increment consecutive throws or reset
+          if (retainTurn) {
+            consecutiveThrows++;
+          } else {
+            consecutiveThrows = 0;
+          }
+
+          // Handle new rule creation if conditions are met
+          if (consecutiveThrows == 3 && retainTurn) {
+            int ruleSetterIndex = (currentPlayerIndex + 1 + widget.players.length) % widget.players.length;
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                TextEditingController ruleController = TextEditingController();
+                return AlertDialog(
+                  title: Text("New Rule Opportunity"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("${widget.players[ruleSetterIndex].name} has managed to roll 3 drink-makers in a row, so they can set a new rule that everyone should follow!"),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: ruleController,
+                        decoration: InputDecoration(
+                          labelText: "Enter your rule",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        String newRule = ruleController.text.trim();
+                        if (newRule.isNotEmpty) {
+                          gameEvents.add("New Rule: $newRule");
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Done"),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+
+          // Pass turn if consecutive throws exceed 3 or retainTurn is false
+          if (!retainTurn || consecutiveThrows >= 3) {
             currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
+            consecutiveThrows = 0; // Reset for the next player
           }
         });
         _controller.reset();
