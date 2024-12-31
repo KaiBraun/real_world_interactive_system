@@ -6,7 +6,6 @@ import 'package:party_app/shared/utils.dart';
 import 'package:party_app/ui/role_dice.dart';
 
 import '../entities/player.dart';
-
 class SelectDrinkingLevelView extends StatefulWidget {
   final List<Player> currentPlayers;
 
@@ -24,74 +23,28 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
         color: Constants.primaryColor,
         height: Utils.getHeight(context),
         width: Utils.getWidth(context),
-        child: Align(
-          alignment: Alignment.center,
-          child: Container(
-            width: Utils.getWidth(context) * 0.8,
-            child: Column(
-              children: [
-                SizedBox(height: Utils.getHeight(context) * 0.1),
-                Container(
-                  height: 200,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,  // Centers the row content
-                        crossAxisAlignment: CrossAxisAlignment.center, // Vertically aligns the content
-                        children: [
-                          Column(  // Wrap text inside a column to keep 'Insert the' and 'players' stacked vertically
-                            mainAxisSize: MainAxisSize.min, // Prevents the column from taking unnecessary height
-                            children: [
-                              Text(
-                                'Level of',
-                                style: TextStyle(
-                                  fontSize: 34,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Lemon',
-                                  color: Colors.black,
-                                  height: 1,
-                                ),
-                              ),
-                              Text(
-                                'Responsability',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Lemon',
-                                  color: Colors.black,
-                                  height: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 10),
-                          Align(
-                            alignment: Alignment.center, // Default alignment (middle)
-                            child: Image.asset(
-                              'assets/images/insertplayers2.png',
-                              width: 65,
-                              height: 65,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: ListView.builder(
-                        itemCount: widget.currentPlayers.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index == 0) {
-                            return Container();
-                          }
-                          return buildPlayerCard(widget.currentPlayers[index]);
-                        })),
-                buildNextAndBackButtons(context)
-              ],
+        child: Column(
+          children: [
+            SizedBox(height: Utils.getHeight(context) * 0.1),
+            Text(
+              'Select Knights of 3',
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Lemon',
+                color: Colors.black,
+              ),
             ),
-          ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.currentPlayers.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildPlayerCard(widget.currentPlayers[index]);
+                },
+              ),
+            ),
+            buildNextAndBackButtons(context),
+          ],
         ),
       ),
     );
@@ -99,24 +52,24 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
 
   Widget buildPlayerCard(Player player) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(player.name),
-        DropdownButton<DrinkingLevel>(
-            value: player.drinkingLevel,
-            items: DrinkingLevel.values.map((level) {
-              return DropdownMenuItem(
-                value: level,
-                child: Text(level.name),
-              );
-            }).toList(),
-            onChanged: (newLevel) {
-              if (newLevel != null) {
-                setState(() {
-                  player.drinkingLevel = newLevel;
-                });
-              }
-            }),
+        Row(
+          children: [
+            Text("Knight of 3"),
+            Checkbox(
+              value: player.isKnightOf3,
+              onChanged: (bool? value) {
+                if (value != null) {
+                  setState(() {
+                    player.isKnightOf3 = value;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -126,14 +79,18 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-            onPressed: () => {Navigator.pop(context)},
-            child: AutoSizeText("Back")),
+          onPressed: () => Navigator.pop(context),
+          child: Text("Back"),
+        ),
         ElevatedButton(
-            onPressed: () => {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => RoleDiceView(players: widget.currentPlayers,)))
-                },
-            child: AutoSizeText("Start Game"))
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RoleDiceView(players: widget.currentPlayers),
+            ),
+          ),
+          child: Text("Start Game"),
+        ),
       ],
     );
   }

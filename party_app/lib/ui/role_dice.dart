@@ -12,133 +12,147 @@ import '../shared/utils.dart';
 class RoleDiceView extends StatefulWidget {
   RoleDiceView({super.key, required this.players});
 
-  List<Player> players;
+  final List<Player> players;
 
   @override
   State<RoleDiceView> createState() => _RoleDiceState();
 }
 
-class _RoleDiceState extends State<RoleDiceView> {
-  
-
-  //attributes for dice
+class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
   Random random = Random();
   int die1Value = 1;
   int die2Value = 1;
   int sum = 0;
-  int counter = 1;
-  List<String> images = [
-    'dummy',
-    'assets/images/die_1.png',
-    'assets/images/die_2.png',
-    'assets/images/die_3.png',
-    'assets/images/die_4.png',
-    'assets/images/die_5.png',
-    'assets/images/die_6.png',
-  ];
+  List<String> gameEvents = [];
+  int currentPlayerIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.bounceInOut,
+    );
 
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          die1Value = random.nextInt(6) + 1;
+          die2Value = random.nextInt(6) + 1;
+          sum = die1Value + die2Value;
 
+          String eventMessage = "${widget.players[currentPlayerIndex].name} rolled $die1Value and $die2Value (Sum: $sum).";
+
+          // Check rules for retaining turn
+          bool retainTurn = false;
+          if (die1Value == die2Value) {
+            eventMessage += " Rolled doubles, they play again!";
+            retainTurn = true;
+          } else if (sum == 7) {
+            eventMessage += " Previous player drinks!";
+          } else if (sum == 8) {
+            eventMessage += " Everyone drinks!";
+          } else if (sum == 9) {
+            eventMessage += " Next player drinks!";
+          }
+
+          gameEvents.add(eventMessage);
+          if (gameEvents.length > 10) {
+            gameEvents.removeAt(0);
+          }
+
+          // Pass turn if not retaining
+          if (!retainTurn) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
+          }
+        });
+        _controller.reset();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    GameHandler handler = GameHandler(players: widget.players);
     return Scaffold(
       body: Container(
         color: Constants.primaryColor,
         height: Utils.getHeight(context),
         width: Utils.getWidth(context),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () => {
-                  Timer.periodic(const Duration(microseconds: 80), (timer) {
-                    counter++;
-                    setState(() {
-                      List<int> diceResult = rollDice();
-                      die1Value = diceResult[0];
-                      die2Value = diceResult[1];
-                      sum = diceResult[2];
-                    });
-                    if (counter >= 100) {
-                      timer.cancel();
-                      setState(() {
-                        counter = 1;
-                      });
-                      //handler.handleSips(die1Value, die2Value, context);
-                      //handler.handleKnights(die1Value, die2Value, context);
-
-                      List<String> popups = [
-                        "This is the first popup.",
-                        "Here's the second popup.",
-                        "Finally, the last popup!"
-                      ];
-                      showPopups(context, popups,0);
-                    }
-                  }),
-
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Transform.rotate(
-                      angle: random.nextDouble() * 180,
-                      child: Image.asset(
-                        images[die1Value],
-                        height: 100,
-                      ),
-                    ),
-                    Transform.rotate(
-                      angle: random.nextDouble() * 180,
-                      child: Image.asset(
-                        images[die2Value],
-                        height: 100,
-                      ),
-                    ),
-                  ],
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: Utils.getHeight(context) * 0.1),
+            Text(
+              "Current Player: ${widget.players[currentPlayerIndex].name}",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              SizedBox(height: Utils.getHeight(context)*0.1,),
-            ],
-          ),
+            ),
+            SizedBox(height: Utils.getHeight(context) * 0.2),
+            GestureDetector(
+              onTap: () => _controller.forward(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return Transform.rotate(
+                        angle: _animation.value * 2 * pi,
+                        child: Image.asset(
+                          'assets/images/die_$die1Value.png',
+                          height: 100,
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 20),
+                  AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return Transform.rotate(
+                        angle: _animation.value * 2 * pi,
+                        child: Image.asset(
+                          'assets/images/die_$die2Value.png',
+                          height: 100,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: Utils.getHeight(context) * 0.1),
+            Expanded(
+              child: ListView.builder(
+                itemCount: gameEvents.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      gameEvents[index],
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
-
-
-
-Future<void> showPopups(BuildContext context, List<String> messages, int index) async {
-  // Base case: Stop when all popups are shown
-  if (index >= messages.length) return;
-
-  // Show the current popup
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Popup ${index + 1}"),
-        content: Text(messages[index]),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the current popup
-            },
-            child: Text("Next"),
-          ),
-        ],
-      );
-    },
-  );
-
-  // Add a brief pause after the current popup is dismissed
-  await Future.delayed(const Duration(milliseconds: 500));
-
-  // Show the next popup recursively
-  await showPopups(context, messages, index + 1);
-}
-
-

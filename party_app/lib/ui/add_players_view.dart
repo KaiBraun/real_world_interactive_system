@@ -37,11 +37,11 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,  // Centers the row content
-                          crossAxisAlignment: CrossAxisAlignment.center, // Vertically aligns the content
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(  // Wrap text inside a column to keep 'Insert the' and 'players' stacked vertically
-                              mainAxisSize: MainAxisSize.min, // Prevents the column from taking unnecessary height
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   'Insert the',
@@ -67,7 +67,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                             ),
                             SizedBox(width: 10),
                             Align(
-                              alignment: Alignment.center, // Default alignment (middle)
+                              alignment: Alignment.center,
                               child: Image.asset(
                                 'assets/images/insertplayers2.png',
                                 width: 65,
@@ -85,9 +85,6 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: widget.currentPlayers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      if (index == 0) {
-                        return Container();
-                      }
                       return buildPlayerCard(widget.currentPlayers[index]);
                     },
                   ),
@@ -121,18 +118,6 @@ class _AddPlayersViewState extends State<AddPlayersView> {
             Text(player.name),
           ],
         ),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: () => {},
-              child: AutoSizeText("Designated Driver"),
-            ),
-            ElevatedButton(
-              onPressed: () => {},
-              child: AutoSizeText("True Player"),
-            ),
-          ],
-        ),
         Divider(
           color: Colors.black,
           thickness: 2,
@@ -148,7 +133,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
           child: TextField(
             controller: addPlayerController,
             decoration: InputDecoration(
-              hintText: 'Enter player name',  // Optional: Hint text for better UX
+              hintText: 'Enter player name',
             ),
           ),
         ),
@@ -156,9 +141,8 @@ class _AddPlayersViewState extends State<AddPlayersView> {
           onPressed: () {
             if (addPlayerController.text.isNotEmpty) {
               setState(() {
-                // Add player without clearing the input field
                 widget.currentPlayers.add(Player(name: addPlayerController.text));
-                // Don't clear the input field, so the first name stays
+                addPlayerController.clear(); // Clear the input field
               });
             }
           },
@@ -170,33 +154,33 @@ class _AddPlayersViewState extends State<AddPlayersView> {
 
   Widget buildNextButton() {
     return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-              elevation: 3,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+        elevation: 3,
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectDrinkingLevelView(
+              currentPlayers: widget.currentPlayers,
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SelectDrinkingLevelView(
-                    currentPlayers: widget.currentPlayers,
-                  ),
-                ),
-              );
-            },
-            child: Text(
-              "Next",
-              style: TextStyle(
-                fontFamily: 'SofadiOne',
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          );
-        }
-      }
+          ),
+        );
+      },
+      child: Text(
+        "Next",
+        style: TextStyle(
+          fontFamily: 'SofadiOne',
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
