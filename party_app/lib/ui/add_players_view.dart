@@ -33,18 +33,21 @@ class _AddPlayersViewState extends State<AddPlayersView> {
 
   // Function to pick a random character image and ensure no duplicates
   String getRandomCharacterImage() {
-    final availableImages = characterImages.where((image) => !usedCharacterImages.contains(image)).toList();
+    final availableImages = characterImages.where((
+        image) => !usedCharacterImages.contains(image)).toList();
 
     if (availableImages.isEmpty) {
-      return '';  // No images left to assign
+      return ''; // No images left to assign
     }
 
     final random = Random();
-    final selectedImage = availableImages[random.nextInt(availableImages.length)];
-    usedCharacterImages.add(selectedImage);  // Mark the image as used
+    final selectedImage = availableImages[random.nextInt(
+        availableImages.length)];
+    usedCharacterImages.add(selectedImage); // Mark the image as used
     return selectedImage;
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +63,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               child: Column(
                 children: [
                   SizedBox(height: Utils.getHeight(context) * 0.1),
+                  // Title section
                   Container(
                     height: 200,
                     child: Column(
@@ -108,16 +112,23 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
-                  // Scrollable ListView of players with increased height
-                  SizedBox(
-                    height: 300, // Increase the height of the scrollable area
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: widget.currentPlayers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return buildPlayerCard(widget.currentPlayers[index]);
-                      },
+                  // Apply offset to the scrolling list
+                  Transform.translate(
+                    offset: Offset(0, -30), // Move the list up by 10 pixels
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(),
+                      child: Container(
+                        height: 400,
+                        width: 300,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: widget.currentPlayers.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return buildPlayerCard(
+                                widget.currentPlayers[index]);
+                          },
+                        ),
+                      ),
                     ),
                   ),
                   // If less than 8 players, show the input field and add button
@@ -133,12 +144,27 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     );
   }
 
-  // Player card with a character image
+
+  // Player card with a character image inside a white box
   Widget buildPlayerCard(Player player) {
-    // Return the player card with the assigned character image
-    return Column(
-      children: [
-        Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      // Vertical space between cards
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
           children: [
             // Character image
             Container(
@@ -147,20 +173,17 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: AssetImage(player.characterImage),  // Use the player’s character image
+                  image: AssetImage(player.characterImage),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            SizedBox(width: 10),
-            Text(player.name),
+            SizedBox(width: 20),
+            Text(player.name,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
           ],
         ),
-        Divider(
-          color: Colors.black,
-          thickness: 2,
-        )
-      ],
+      ),
     );
   }
 
@@ -206,32 +229,43 @@ class _AddPlayersViewState extends State<AddPlayersView> {
   }
 
   Widget buildNextButton() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-        elevation: 3,
-      ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SelectDrinkingLevelView(
-              currentPlayers: widget.currentPlayers,
+    return Transform.translate(
+      offset: Offset(0, -30),
+      // Adjust the vertical position by 20 pixels (can be customized)
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              elevation: 3,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      SelectDrinkingLevelView(
+                        currentPlayers: widget.currentPlayers,
+                      ),
+                ),
+              );
+            },
+            child: Text(
+              "Next",
+              style: TextStyle(
+                fontFamily: 'SofadiOne',
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
-        );
-      },
-      child: Text(
-        "Next",
-        style: TextStyle(
-          fontFamily: 'SofadiOne',
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
         ),
       ),
     );

@@ -75,11 +75,12 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
               ),
             ),
             // Smaller scrollable list section
+            // Smaller scrollable list section
             Expanded(
               flex: 3,
               child: SingleChildScrollView(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.0),
+                  margin: EdgeInsets.symmetric(horizontal: 30),
                   child: Column(
                     children: List.generate(
                       widget.currentPlayers.length,
@@ -89,7 +90,7 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
                 ),
               ),
             ),
-            // Button section with adjusted spacing
+// Button section with adjusted spacing
             Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: buildNextAndBackButtons(context),
@@ -100,6 +101,7 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
     );
   }
 
+  // Card displaying the player's name and associated character image
   Widget buildPlayerCard(Player player) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -120,10 +122,28 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              player.name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // Character image and player's name
+            Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(player.characterImage), // Displaying the character image
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Text(
+                  player.name,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
+            // Option to select Knight of 3 status
             Row(
               children: [
                 Text(
@@ -148,6 +168,7 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
     );
   }
 
+  // Next and Back buttons
   Widget buildNextAndBackButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center, // Center both buttons
