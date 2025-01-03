@@ -1,5 +1,4 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:party_app/entities/player.dart';
 import 'package:party_app/shared/constants.dart';
@@ -16,6 +15,35 @@ class AddPlayersView extends StatefulWidget {
 class _AddPlayersViewState extends State<AddPlayersView> {
   TextEditingController addPlayerController = TextEditingController();
   ScrollController _scrollController = ScrollController();
+
+  // List of available character images in assets
+  final List<String> characterImages = [
+    'assets/images/Characters/Character1.png',
+    'assets/images/Characters/Character2.png',
+    'assets/images/Characters/Character3.png',
+    'assets/images/Characters/Character4.png',
+    'assets/images/Characters/Character5.png',
+    'assets/images/Characters/Character6.png',
+    'assets/images/Characters/Character7.png',
+    'assets/images/Characters/Character8.png',
+  ];
+
+  // List to track used character images
+  List<String> usedCharacterImages = [];
+
+  // Function to pick a random character image and ensure no duplicates
+  String getRandomCharacterImage() {
+    final availableImages = characterImages.where((image) => !usedCharacterImages.contains(image)).toList();
+
+    if (availableImages.isEmpty) {
+      return '';  // No images left to assign
+    }
+
+    final random = Random();
+    final selectedImage = availableImages[random.nextInt(availableImages.length)];
+    usedCharacterImages.add(selectedImage);  // Mark the image as used
+    return selectedImage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +96,9 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                             ),
                             SizedBox(width: 10),
                             Transform.translate(
-                              offset: Offset(0, -5), // Shift the image 10 pixels upward
+                              offset: Offset(0, -5),
                               child: Image.asset(
-                                'assets/images/insertplayers2.png', // Update with your desired image
+                                'assets/images/insertplayers2.png',
                                 width: 80,
                                 height: 80,
                               ),
@@ -85,14 +113,15 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                   SizedBox(
                     height: 300, // Increase the height of the scrollable area
                     child: ListView.builder(
-                      controller: _scrollController, // Add the controller to the ListView
+                      controller: _scrollController,
                       itemCount: widget.currentPlayers.length,
                       itemBuilder: (BuildContext context, int index) {
                         return buildPlayerCard(widget.currentPlayers[index]);
                       },
                     ),
                   ),
-                  buildAddPlayerButton(),
+                  // If less than 8 players, show the input field and add button
+                  if (widget.currentPlayers.length < 8) buildAddPlayerButton(),
                   SizedBox(height: Utils.getHeight(context) * 0.1),
                   buildNextButton(),
                 ],
@@ -104,21 +133,26 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     );
   }
 
+  // Player card with a character image
   Widget buildPlayerCard(Player player) {
+    // Return the player card with the assigned character image
     return Column(
       children: [
         Row(
           children: [
+            // Character image
             Container(
               width: 50,
               height: 50,
-              decoration: BoxDecoration(shape: BoxShape.circle),
-              child: Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage(player.characterImage),  // Use the player’s character image
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
+            SizedBox(width: 10),
             Text(player.name),
           ],
         ),
@@ -145,14 +179,23 @@ class _AddPlayersViewState extends State<AddPlayersView> {
           onPressed: () {
             if (addPlayerController.text.isNotEmpty) {
               setState(() {
-                widget.currentPlayers.add(Player(name: addPlayerController.text));
-                addPlayerController.clear(); // Clear the input field
-                // Scroll to the last added player
-                _scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                );
+                // Add player with random character image
+                String characterImage = getRandomCharacterImage();
+                if (characterImage.isNotEmpty) {
+                  widget.currentPlayers.add(
+                    Player(
+                      name: addPlayerController.text,
+                      characterImage: characterImage,
+                    ),
+                  );
+                  addPlayerController.clear(); // Clear the input field
+                  // Scroll to the last added player
+                  _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                }
               });
             }
           },
@@ -194,5 +237,3 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     );
   }
 }
-
-

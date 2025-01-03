@@ -1,13 +1,14 @@
 class Player {
-  Player({required this.name});
+  Player({required this.name, required this.characterImage});  // Add characterImage to constructor
 
   String name;
   bool driver = false;
-  DrinkingLevel drinkingLevel = DrinkingLevel.medium; // This can be removed if not needed
+  DrinkingLevel drinkingLevel = DrinkingLevel.medium;
   int numberOfSips = 0;
-  bool isKnightOf3 = false; // New field to track if the player is a Knight of 3
-  bool isDrinkingMost = false; // Tracks if the player is drinking the most
-  bool isDrinkingLeast = false; // Tracks if the player is drinking the least
+  bool isKnightOf3 = false;
+  bool isDrinkingMost = false;
+  bool isDrinkingLeast = false;
+  String characterImage;  // New field for the character image
 }
 
 enum DrinkingLevel { low, medium, high, nuclear }
