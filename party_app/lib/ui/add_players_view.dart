@@ -15,6 +15,7 @@ class AddPlayersView extends StatefulWidget {
 
 class _AddPlayersViewState extends State<AddPlayersView> {
   TextEditingController addPlayerController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +67,12 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                               ],
                             ),
                             SizedBox(width: 10),
-                            Align(
-                              alignment: Alignment.center,
+                            Transform.translate(
+                              offset: Offset(0, -5), // Shift the image 10 pixels upward
                               child: Image.asset(
-                                'assets/images/insertplayers2.png',
-                                width: 65,
-                                height: 65,
+                                'assets/images/insertplayers2.png', // Update with your desired image
+                                width: 80,
+                                height: 80,
                               ),
                             ),
                           ],
@@ -80,13 +81,16 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: widget.currentPlayers.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildPlayerCard(widget.currentPlayers[index]);
-                    },
+                  // Scrollable ListView of players with increased height
+                  SizedBox(
+                    height: 300, // Increase the height of the scrollable area
+                    child: ListView.builder(
+                      controller: _scrollController, // Add the controller to the ListView
+                      itemCount: widget.currentPlayers.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return buildPlayerCard(widget.currentPlayers[index]);
+                      },
+                    ),
                   ),
                   buildAddPlayerButton(),
                   SizedBox(height: Utils.getHeight(context) * 0.1),
@@ -143,6 +147,12 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               setState(() {
                 widget.currentPlayers.add(Player(name: addPlayerController.text));
                 addPlayerController.clear(); // Clear the input field
+                // Scroll to the last added player
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
               });
             }
           },
@@ -184,3 +194,5 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     );
   }
 }
+
+
