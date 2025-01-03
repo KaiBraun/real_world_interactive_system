@@ -33,21 +33,20 @@ class _AddPlayersViewState extends State<AddPlayersView> {
 
   // Function to pick a random character image and ensure no duplicates
   String getRandomCharacterImage() {
-    final availableImages = characterImages.where((
-        image) => !usedCharacterImages.contains(image)).toList();
+    final availableImages = characterImages
+        .where((image) => !usedCharacterImages.contains(image))
+        .toList();
 
     if (availableImages.isEmpty) {
       return ''; // No images left to assign
     }
 
     final random = Random();
-    final selectedImage = availableImages[random.nextInt(
-        availableImages.length)];
+    final selectedImage = availableImages[random.nextInt(availableImages.length)];
     usedCharacterImages.add(selectedImage); // Mark the image as used
     return selectedImage;
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,18 +113,54 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                   ),
                   // Apply offset to the scrolling list
                   Transform.translate(
-                    offset: Offset(0, -30), // Move the list up by 10 pixels
+                    offset: Offset(0, -30), // Move the list up by 30 pixels
                     child: Padding(
                       padding: const EdgeInsets.symmetric(),
                       child: Container(
                         height: 400,
-                        width: 300,
                         child: ListView.builder(
                           controller: _scrollController,
                           itemCount: widget.currentPlayers.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return buildPlayerCard(
-                                widget.currentPlayers[index]);
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(12.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Character image
+                                    Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: AssetImage(widget.currentPlayers[index].characterImage),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      widget.currentPlayers[index].name,
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -133,55 +168,12 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                   ),
                   // If less than 8 players, show the input field and add button
                   if (widget.currentPlayers.length < 8) buildAddPlayerButton(),
-                  SizedBox(height: Utils.getHeight(context) * 0.1),
+                  SizedBox(),
                   buildNextButton(),
                 ],
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-
-  // Player card with a character image inside a white box
-  Widget buildPlayerCard(Player player) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      // Vertical space between cards
-      child: Container(
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Character image
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage(player.characterImage),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(width: 20),
-            Text(player.name,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          ],
         ),
       ),
     );
@@ -230,8 +222,8 @@ class _AddPlayersViewState extends State<AddPlayersView> {
 
   Widget buildNextButton() {
     return Transform.translate(
-      offset: Offset(0, -30),
-      // Adjust the vertical position by 20 pixels (can be customized)
+      offset: Offset(0, 20),
+      // Adjust the vertical position by 30 pixels
       child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
@@ -249,10 +241,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      SelectDrinkingLevelView(
-                        currentPlayers: widget.currentPlayers,
-                      ),
+                  builder: (context) => SelectDrinkingLevelView(currentPlayers: widget.currentPlayers),
                 ),
               );
             },
