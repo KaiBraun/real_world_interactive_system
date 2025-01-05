@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../application_logic/game_logic.dart';
 import '../entities/player.dart';
 import '../shared/constants.dart';
 import '../shared/utils.dart';
@@ -14,7 +15,8 @@ class RoleDiceView extends StatefulWidget {
   State<RoleDiceView> createState() => _RoleDiceState();
 }
 
-class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateMixin {
+class _RoleDiceState extends State<RoleDiceView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   Random random = Random();
@@ -45,24 +47,24 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {
-          die1Value = random.nextInt(6) + 1;
-          die2Value = random.nextInt(6) + 1;
-          sum = die1Value + die2Value;
+          List<int> results = rollDice();
+          die1Value = results[0];
+          die2Value = results[1];
+          sum = results[2];
 
           String eventMessage =
               "${widget.players[currentPlayerIndex].name} rolled $die1Value and $die2Value (Sum: $sum).";
 
           if (die1Value == 3 || die2Value == 3) {
-            List<Player> knights = widget.players
-                .where((player) => player.isKnightOf3)
-                .toList();
+            List<Player> knights =
+                widget.players.where((player) => player.isKnightOf3).toList();
 
             if (knights.isNotEmpty) {
               for (var knight in knights) {
                 knight.numberOfSips++;
               }
               eventMessage +=
-              " Knights of 3 (${knights.map((knight) => knight.name).join(", ")}) drink!";
+                  " Knights of 3 (${knights.map((knight) => knight.name).join(", ")}) drink!";
               updateDrinkingStatus(); // Update roles after Knights of 3 drink
             }
           }
@@ -98,12 +100,13 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
             );
           } else if (sum == 7) {
             retainTurn = true;
-            int previousPlayerIndex =
-            (currentPlayerIndex == 0) ? widget.players.length - 1 : currentPlayerIndex - 1;
+            int previousPlayerIndex = (currentPlayerIndex == 0)
+                ? widget.players.length - 1
+                : currentPlayerIndex - 1;
             Player previousPlayer = widget.players[previousPlayerIndex];
             previousPlayer.numberOfSips++;
             eventMessage +=
-            " ${previousPlayer.name}, you drink as you are the previous player!";
+                " ${previousPlayer.name}, you drink as you are the previous player!";
             updateDrinkingStatus(); // Update roles after previous player drinks
           } else if (sum == 8) {
             retainTurn = true;
@@ -119,7 +122,7 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
             Player nextPlayer = widget.players[nextPlayerIndex];
             nextPlayer.numberOfSips++;
             eventMessage +=
-            " ${nextPlayer.name}, you drink as you are the next player!";
+                " ${nextPlayer.name}, you drink as you are the next player!";
             updateDrinkingStatus(); // Update roles after next player drinks
           }
 
@@ -181,12 +184,14 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
               },
             );
 
-            currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
+            currentPlayerIndex =
+                (currentPlayerIndex + 1) % widget.players.length;
             consecutiveThrows = 0;
           }
 
           if (!retainTurn || consecutiveThrows >= 3) {
-            currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
+            currentPlayerIndex =
+                (currentPlayerIndex + 1) % widget.players.length;
             consecutiveThrows = 0;
           }
         });
@@ -197,11 +202,17 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
 
   void updateDrinkingStatus() {
     if (widget.players.isNotEmpty) {
-      int maxSips = widget.players.map((p) => p.numberOfSips).reduce((a, b) => a > b ? a : b);
-      int minSips = widget.players.map((p) => p.numberOfSips).reduce((a, b) => a < b ? a : b);
+      int maxSips = widget.players
+          .map((p) => p.numberOfSips)
+          .reduce((a, b) => a > b ? a : b);
+      int minSips = widget.players
+          .map((p) => p.numberOfSips)
+          .reduce((a, b) => a < b ? a : b);
 
-      List<Player> mostDrunk = widget.players.where((p) => p.numberOfSips == maxSips).toList();
-      List<Player> leastDrunk = widget.players.where((p) => p.numberOfSips == minSips).toList();
+      List<Player> mostDrunk =
+          widget.players.where((p) => p.numberOfSips == maxSips).toList();
+      List<Player> leastDrunk =
+          widget.players.where((p) => p.numberOfSips == minSips).toList();
 
       if (mostDrunk.length == 1) {
         houseElf = mostDrunk.first.name;
@@ -228,17 +239,38 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: Utils.getHeight(context) * 0.1),
-            Text(
-              "Current Player: ${widget.players[currentPlayerIndex].name}",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                width: 75,
+                height: 75,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(
+                        widget.players[currentPlayerIndex].characterImage),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
+              Text(
+                "${widget.players[currentPlayerIndex].name}: Your Turn",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ]),
+            Divider(
+              thickness: 1,
+              height: 10,
+              indent: Utils.getWidth(context) * 0.1, // Left spacing
+              endIndent: Utils.getWidth(context) * 0.1, // Right spacing
             ),
             SizedBox(height: Utils.getHeight(context) * 0.02),
             Text(
               widget.players
-                  .map((player) => "${player.name}: ${player.numberOfSips} sips${player.name == kingOfTheCastle ? " (King of the Castle)" : player.name == houseElf ? " (House Elf)" : ""}")
+                  .map((player) =>
+                      "${player.name}: ${player.numberOfSips} sips${player.name == kingOfTheCastle ? " (King of the Castle)" : player.name == houseElf ? " (House Elf)" : ""}")
                   .join(" | "),
               style: TextStyle(
                 fontSize: 20,
@@ -249,15 +281,17 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
             if (currentRules.isNotEmpty) ...[
               SizedBox(height: Utils.getHeight(context) * 0.01),
               Column(
-                children: currentRules.map((rule) => Text(
-                  rule,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.red,
-                    fontStyle: FontStyle.italic,
-                  ),
-                  textAlign: TextAlign.center,
-                )).toList(),
+                children: currentRules
+                    .map((rule) => Text(
+                          rule,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.red,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ))
+                    .toList(),
               ),
             ],
             SizedBox(height: Utils.getHeight(context) * 0.2),
@@ -295,6 +329,28 @@ class _RoleDiceState extends State<RoleDiceView> with SingleTickerProviderStateM
               ),
             ),
             SizedBox(height: Utils.getHeight(context) * 0.1),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: widget.players.map((player) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage(
+                          player.characterImage),
+                    ),
+                    Text(
+                      '${player.numberOfSips}',
+                      style:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: gameEvents.length,
