@@ -28,22 +28,22 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     'assets/images/Characters/Character8.png',
   ];
 
-  // List to track used character images
+
   List<String> usedCharacterImages = [];
 
-  // Function to pick a random character image and ensure no duplicates
+
   String getRandomCharacterImage() {
     final availableImages = characterImages
         .where((image) => !usedCharacterImages.contains(image))
         .toList();
 
     if (availableImages.isEmpty) {
-      return ''; // No images left to assign
+      return '';
     }
 
     final random = Random();
     final selectedImage = availableImages[random.nextInt(availableImages.length)];
-    usedCharacterImages.add(selectedImage); // Mark the image as used
+    usedCharacterImages.add(selectedImage);
     return selectedImage;
   }
 
@@ -62,7 +62,6 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               child: Column(
                 children: [
                   SizedBox(height: Utils.getHeight(context) * 0.1),
-                  // Title section
                   Container(
                     height: 200,
                     child: Column(
@@ -197,7 +196,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               hintText: 'Enter player name',
             ),
             onSubmitted: (value) {
-              _addPlayer(); // Add player when "Enter" is pressed
+              _addPlayer();
             },
             maxLength: 20,
           ),
@@ -215,7 +214,6 @@ class _AddPlayersViewState extends State<AddPlayersView> {
   void _addPlayer() {
     if (addPlayerController.text.isNotEmpty) {
       setState(() {
-        // Add player with random character image
         String characterImage = getRandomCharacterImage();
         if (characterImage.isNotEmpty) {
           widget.currentPlayers.add(
@@ -224,8 +222,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               characterImage: characterImage,
             ),
           );
-          addPlayerController.clear(); // Clear the input field
-          // Scroll to the last added player
+          addPlayerController.clear();
           _scrollController.animateTo(
             _scrollController.position.maxScrollExtent,
             duration: Duration(milliseconds: 300),

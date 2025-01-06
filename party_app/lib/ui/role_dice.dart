@@ -65,7 +65,7 @@ class _RoleDiceState extends State<RoleDiceView>
               }
               eventMessage +=
                   " Knights of 3 (${knights.map((knight) => knight.name).join(", ")}) drink!";
-              updateDrinkingStatus(); // Update roles after Knights of 3 drink
+              updateDrinkingStatus();
             }
           }
 
@@ -123,7 +123,7 @@ class _RoleDiceState extends State<RoleDiceView>
             nextPlayer.numberOfSips++;
             eventMessage +=
                 " ${nextPlayer.name}, you drink as you are the next player!";
-            updateDrinkingStatus(); // Update roles after next player drinks
+            updateDrinkingStatus();
           }
 
           gameEvents.add(eventMessage);
@@ -190,9 +190,11 @@ class _RoleDiceState extends State<RoleDiceView>
           }
 
           if (!retainTurn || consecutiveThrows >= 3) {
-            currentPlayerIndex =
-                (currentPlayerIndex + 1) % widget.players.length;
-            consecutiveThrows = 0;
+            setState(() {
+              gameEvents.clear();  // Clear the events list when switching players
+              currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
+              consecutiveThrows = 0;
+            });
           }
         });
         _controller.reset();
@@ -241,8 +243,8 @@ class _RoleDiceState extends State<RoleDiceView>
             SizedBox(height: Utils.getHeight(context) * 0.1),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
-                width: 75,
-                height: 75,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -252,12 +254,15 @@ class _RoleDiceState extends State<RoleDiceView>
                   ),
                 ),
               ),
+              SizedBox(width: 10),
               Flexible(
                 child: Text(
                   "${widget.players[currentPlayerIndex].name}",
                   style: TextStyle(
-                    fontSize: 24,
+                    fontFamily: 'Lemon',
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -266,14 +271,16 @@ class _RoleDiceState extends State<RoleDiceView>
               Text(
                 ": Your Turn",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontFamily: 'SofadiOne',
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
             ]),
             Divider(
               thickness: 1,
-              height: 10,
+              height: 20,
               indent: Utils.getWidth(context) * 0.1, // Left spacing
               endIndent: Utils.getWidth(context) * 0.1, // Right spacing
             ),
@@ -387,4 +394,7 @@ class _RoleDiceState extends State<RoleDiceView>
     _controller.dispose();
     super.dispose();
   }
+
 }
+
+
