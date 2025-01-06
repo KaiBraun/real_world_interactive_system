@@ -6,7 +6,7 @@ import 'package:party_app/shared/utils.dart';
 import 'package:party_app/ui/select_drinking_level_view.dart';
 
 class AddPlayersView extends StatefulWidget {
-  List<Player> currentPlayers = [];
+  List<Player> currentPlayers =[];
 
   @override
   _AddPlayersViewState createState() => _AddPlayersViewState();
@@ -114,58 +114,18 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                   // Apply offset to the scrolling list
                   Transform.translate(
                     offset: Offset(0, -30), // Move the list up by 30 pixels
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(),
-                      child: Container(
-                        height: 400,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: widget.currentPlayers.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Character image
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: AssetImage(widget.currentPlayers[index].characterImage),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        widget.currentPlayers[index].name,
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                    child: Container(
+                      height: 400,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,  // Attach ScrollController here
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 5),
+                          child: Column(
+                            children: List.generate(
+                              widget.currentPlayers.length,
+                                  (index) => buildPlayerCard(widget.currentPlayers[index]),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -177,6 +137,51 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPlayerCard(Player player) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage(player.characterImage),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(width: 20),
+            Flexible(
+              child: Text(
+                player.name,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
         ),
       ),
     );

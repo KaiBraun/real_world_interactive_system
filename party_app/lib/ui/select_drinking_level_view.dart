@@ -101,7 +101,7 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
     );
   }
 
-  // Card displaying the player's name and associated character image
+
   Widget buildPlayerCard(Player player) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
