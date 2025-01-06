@@ -252,8 +252,19 @@ class _RoleDiceState extends State<RoleDiceView>
                   ),
                 ),
               ),
+              Flexible(
+                child: Text(
+                  "${widget.players[currentPlayerIndex].name}",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
               Text(
-                "${widget.players[currentPlayerIndex].name}: Your Turn",
+                ": Your Turn",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

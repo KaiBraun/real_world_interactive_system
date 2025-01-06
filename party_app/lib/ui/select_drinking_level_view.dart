@@ -123,25 +123,31 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Character image and player's name
-            Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(player.characterImage), // Displaying the character image
-                      fit: BoxFit.cover,
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(player.characterImage), // Displaying the character image
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 20),
-                Text(
-                  player.name,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
+                  SizedBox(width: 20),
+                  Flexible(
+                    child: Text(
+                      player.name,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
             // Option to select Knight of 3 status
             Row(

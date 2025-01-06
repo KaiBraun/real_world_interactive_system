@@ -72,7 +72,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
+                            const Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
@@ -153,9 +153,13 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                                       ),
                                     ),
                                     SizedBox(width: 10),
-                                    Text(
-                                      widget.currentPlayers[index].name,
-                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                    Expanded(
+                                      child: Text(
+                                        widget.currentPlayers[index].name,
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -167,8 +171,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                     ),
                   ),
                   // If less than 8 players, show the input field and add button
-                  if (widget.currentPlayers.length < 8) buildAddPlayerButton(),
-                  SizedBox(),
+                  if (widget.currentPlayers.length < 8) buildAddPlayerFields(),
                   buildNextButton(),
                 ],
               ),
@@ -179,7 +182,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     );
   }
 
-  Widget buildAddPlayerButton() {
+  Widget buildAddPlayerFields() {
     return Row(
       children: [
         Expanded(
@@ -188,36 +191,44 @@ class _AddPlayersViewState extends State<AddPlayersView> {
             decoration: InputDecoration(
               hintText: 'Enter player name',
             ),
+            onSubmitted: (value) {
+              _addPlayer(); // Add player when "Enter" is pressed
+            },
+            maxLength: 20,
           ),
         ),
         IconButton(
           onPressed: () {
-            if (addPlayerController.text.isNotEmpty) {
-              setState(() {
-                // Add player with random character image
-                String characterImage = getRandomCharacterImage();
-                if (characterImage.isNotEmpty) {
-                  widget.currentPlayers.add(
-                    Player(
-                      name: addPlayerController.text,
-                      characterImage: characterImage,
-                    ),
-                  );
-                  addPlayerController.clear(); // Clear the input field
-                  // Scroll to the last added player
-                  _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                  );
-                }
-              });
-            }
+            _addPlayer();
           },
           icon: Icon(Icons.add),
         ),
       ],
     );
+  }
+
+  void _addPlayer() {
+    if (addPlayerController.text.isNotEmpty) {
+      setState(() {
+        // Add player with random character image
+        String characterImage = getRandomCharacterImage();
+        if (characterImage.isNotEmpty) {
+          widget.currentPlayers.add(
+            Player(
+              name: addPlayerController.text,
+              characterImage: characterImage,
+            ),
+          );
+          addPlayerController.clear(); // Clear the input field
+          // Scroll to the last added player
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   Widget buildNextButton() {
@@ -238,12 +249,22 @@ class _AddPlayersViewState extends State<AddPlayersView> {
               elevation: 3,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SelectDrinkingLevelView(currentPlayers: widget.currentPlayers),
-                ),
-              );
+              if (widget.currentPlayers.length < 3) {
+                // Show a Snackbar if there are less than 3 players
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please add at least 3 players.'),
+                    duration: Duration(seconds: 3), // Snackbar duration
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SelectDrinkingLevelView(currentPlayers: widget.currentPlayers),
+                  ),
+                );
+              }
             },
             child: Text(
               "Next",
