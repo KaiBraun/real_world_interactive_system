@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import '../entities/player.dart';
 import '../shared/constants.dart';
@@ -7,10 +8,12 @@ import '../shared/utils.dart';
 class DuelView extends StatefulWidget {
   final Player currentPlayer; // The player who initiated the duel.
   final List<Player> players; // List of all players in the game.
-  final Function(int penalty, Player loser) onDuelComplete; // Callback when the duel is over.
+  final Function(int penalty, Player loser)
+  onDuelComplete; // Callback when the duel is over.
   final String die1Image; // Path to the image of the first die.
   final String die2Image; // Path to the image of the second die.
-  final int triggeringValue; // The value of the dice pair that initiated the duel.
+  final int
+  triggeringValue; // The value of the dice pair that initiated the duel.
 
   const DuelView({
     super.key,
@@ -32,14 +35,18 @@ class _DuelViewState extends State<DuelView> {
   int doubleChain = 0; // Accumulated penalty from doubles.
   int penalty = 0; // Final penalty applied to the losing player.
   Random random = Random(); // Random number generator for dice rolls.
-  bool isChoosingRival = true; // Whether the current phase is selecting the rival.
-  bool isCounterattackPhase = false; // Whether it's the counterattack decision phase.
-  String message = "Choose your rival for the duel!"; // Message displayed to the user.
+  bool isChoosingRival =
+  true; // Whether the current phase is selecting the rival.
+  bool isCounterattackPhase =
+  false; // Whether it's the counterattack decision phase.
+  String message =
+      "Choose your rival for the duel!"; // Message displayed to the user.
 
   @override
   void initState() {
     super.initState();
-    currentAttacker = widget.currentPlayer; // The initiator starts as the attacker.
+    currentAttacker =
+        widget.currentPlayer; // The initiator starts as the attacker.
   }
 
   // Rolls dice for a counterattack attempt.
@@ -61,12 +68,15 @@ class _DuelViewState extends State<DuelView> {
         // Return to counterattack decision phase for the new defender.
         isCounterattackPhase = true;
         message =
-        "${currentDefender.name}, doubles rolled! Do you accept your fate or counterattack? (Current penalty: $doubleChain sips)";
+        "${currentDefender
+            .name}, doubles rolled! Do you accept your fate or counterattack? (Current penalty: $doubleChain sips)";
       } else {
         // If doubles are not rolled, calculate the penalty.
-        penalty = doubleChain + min(die1, die2); // Add smallest die value to the chain.
+        penalty = doubleChain +
+            min(die1, die2); // Add smallest die value to the chain.
         message =
-        "${currentDefender.name} failed to roll doubles! Penalty: $penalty sips.";
+        "${currentDefender
+            .name} failed to roll doubles! Penalty: $penalty sips.";
         endDuel();
       }
     });
@@ -77,7 +87,8 @@ class _DuelViewState extends State<DuelView> {
     setState(() {
       // Apply the accumulated penalty (or initial value if no doubles).
       penalty = doubleChain > 0 ? doubleChain : widget.triggeringValue;
-      message = "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
+      message =
+      "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
       endDuel();
     });
   }
@@ -85,7 +96,8 @@ class _DuelViewState extends State<DuelView> {
   // Ends the duel and notifies the parent widget.
   void endDuel() {
     Future.delayed(Duration(seconds: 2), () {
-      widget.onDuelComplete(penalty, currentDefender); // Notify about the result.
+      widget.onDuelComplete(
+          penalty, currentDefender); // Notify about the result.
       Navigator.pop(context); // Close the DuelView.
     });
   }
@@ -93,13 +105,13 @@ class _DuelViewState extends State<DuelView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red, // Red background to signify the intensity of a duel.
+      backgroundColor: Colors.red,
+      // Red background to signify the intensity of a duel.
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Displays the current message to the players.
-            Text(
+            SizedBox(height: Utils.getHeight(context) * 0.1),
+            AutoSizeText(
               message,
               style: TextStyle(
                 fontSize: 24,
@@ -108,7 +120,8 @@ class _DuelViewState extends State<DuelView> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20), // Spacing between elements.
+            SizedBox(height: 20),
+            // Spacing between elements.
 
             // Displays the dice images.
             Row(
@@ -121,82 +134,165 @@ class _DuelViewState extends State<DuelView> {
             ),
 
             // If a rival is being chosen, show the list of players to choose from.
-            if (isChoosingRival)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.players.length,
-                  itemBuilder: (context, index) {
-                    Player player = widget.players[index];
-                    if (player == widget.currentPlayer) return Container(); // Skip the current player.
-                    return ListTile(
-                      title: Text(
-                        player.name,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          // Set the selected player as the rival.
-                          currentDefender = player;
-                          isChoosingRival = false;
-                          isCounterattackPhase = true;
-                          doubleChain = widget.triggeringValue; // Initialize penalty with triggering value.
-                          message =
-                          "${currentDefender.name}, do you accept your fate or counterattack? (Initial penalty: $doubleChain sips)";
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
+            if (isChoosingRival) buildChooseRivalView(),
 
             // If it's the counterattack phase, show the "Accept Fate" and "Counterattack" options.
-            if (isCounterattackPhase)
-              Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: acceptFate,
-                    child: Text("Accept Fate"),
-                  ),
-                  SizedBox(height: 10), // Spacing between buttons.
-
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        message = "${currentDefender.name}, roll the dice to defend your honor!";
-                        isCounterattackPhase = false; // Move to the dice-rolling phase.
-                      });
-                    },
-                    child: Text("Counterattack"),
-                  ),
-                ],
-              ),
+            if (isCounterattackPhase) buildChooseCounterattackView(),
 
             // If the counterattack phase has started, allow the rival to tap and roll the dice.
             if (!isChoosingRival && !isCounterattackPhase)
-              Column(
-                children: [
-                  GestureDetector(
-                    onTap: rollDiceForCounterattack, // Handles the dice roll when tapped.
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/images/die_${random.nextInt(6) + 1}.png', height: 100),
-                        SizedBox(width: 20), // Spacing between dice.
-                        Image.asset('assets/images/die_${random.nextInt(6) + 1}.png', height: 100),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20), // Spacing.
-
-                  // Instruction to tap the dice.
-                  Text(
-                    "Tap the dice to roll!",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ],
-              ),
+              buildCounterattackPhaseView(),
           ],
         ),
+      ),
+    );
+  }
+
+  Column buildCounterattackPhaseView() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: rollDiceForCounterattack, // Handles the dice roll when tapped.
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/die_${random.nextInt(6) + 1}.png',
+                  height: 100),
+              SizedBox(width: 20), // Spacing between dice.
+              Image.asset('assets/images/die_${random.nextInt(6) + 1}.png',
+                  height: 100),
+            ],
+          ),
+        ),
+        SizedBox(height: 20), // Spacing.
+
+        // Instruction to tap the dice.
+        Text(
+          "Tap the dice to roll!",
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget buildChooseCounterattackView() {
+    return SizedBox(
+      width: Utils.getWidth(context) * 0.8,
+      child: Column(
+        children: [
+          SizedBox(height: Utils.getHeight(context) * 0.05),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 75,
+                height: 75,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(currentDefender.characterImage),
+                    // Displaying the character image
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              SizedBox(width: 20),
+              Flexible(
+                  child: Text(
+                    currentDefender.name,
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )
+              )
+            ],
+          ),
+          AutoSizeText("Do you accept your fate or counterattack?",
+            style: TextStyle(color: Colors.white), maxFontSize: 20,),
+          Text("(Initial penalty: $doubleChain sips)",
+            style: TextStyle(color: Colors.white),),
+          SizedBox(height: Utils.getHeight(context) * 0.05),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: acceptFate,
+                child: Text("Accept Fate"),
+              ),
+              SizedBox(height: 10), // Spacing between buttons.
+
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    message =
+                    "${currentDefender
+                        .name}, roll the dice to defend your honor!";
+                    isCounterattackPhase =
+                    false; // Move to the dice-rolling phase.
+                  });
+                },
+                child: Text("Counterattack"),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded buildChooseRivalView() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: widget.players.length,
+        itemBuilder: (context, index) {
+          Player player = widget.players[index];
+          if (player == widget.currentPlayer) {
+            return Container(); // Skip the current player.
+          }
+          return Padding(
+            padding: EdgeInsets.all(5),
+            child: Container(
+                padding: const EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 20,
+                    // Adjust the size of the avatar
+                    backgroundImage: AssetImage(player.characterImage),
+                    // Path to the player's image
+                    backgroundColor: Colors
+                        .transparent, // Optional: Set a transparent background
+                  ),
+                  title: Text(
+                    player.name,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      // Set the selected player as the rival.
+                      currentDefender = player;
+                      isChoosingRival = false;
+                      isCounterattackPhase = true;
+                      doubleChain = widget
+                          .triggeringValue; // Initialize penalty with triggering value.
+                      message =
+                      "What do you do?";
+                    });
+                  },
+                )
+            ),
+          );
+        },
       ),
     );
   }
