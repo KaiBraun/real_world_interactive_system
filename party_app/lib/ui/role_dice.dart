@@ -348,18 +348,24 @@ class _RoleDiceState extends State<RoleDiceView>
                   children: [
                     // Display King's picture if the player is the King of the Castle
                     if (isKingOfCastle)
-                      Image.asset(
-                        'assets/images/kingofthecastle.png', // Replace with your King's image
-                        height: 40,
-                        width: 40,
+                      Padding(
+                        padding: EdgeInsets.only(right: 16),  // Adjust this value to move it left or right
+                        child: Image.asset(
+                          'assets/images/kingofthecastle.png',  // Your King image path
+                          height: 40,
+                          width: 40,
+                        ),
                       ),
                     // Display House Elf's picture if the player is the House Elf
                     if (isHouseElf)
-                      Image.asset(
-                        'assets/images/houseofelf.png', // Replace with your House Elf's image
-                        height: 40,
-                        width: 40,
-                      ),
+                    Padding(
+                    padding: EdgeInsets.only(right: 16),  // Adjust this value to move it left or right
+                    child: Image.asset(
+                    'assets/images/houseofelf.png',  // Your King image path
+                    height: 40,
+                    width: 40,
+                    ),
+                    ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
