@@ -5,6 +5,7 @@ import '../entities/player.dart';
 import '../shared/constants.dart';
 import '../shared/utils.dart';
 import 'duel_view.dart';
+import 'package:party_app/ui/rules_view.dart';
 
 class RoleDiceView extends StatefulWidget {
   RoleDiceView({super.key, required this.players});
@@ -520,9 +521,31 @@ class _RoleDiceState extends State<RoleDiceView>
                   );
                 },
               ),
-            )
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Information_button(context),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget Information_button(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RulesView(), //
+          ),
+        );
+      },
+      child: Image.asset(
+        'assets/images/information.png', // Replace with the path to your image
+        height: 40,
+        width: 40,
       ),
     );
   }
