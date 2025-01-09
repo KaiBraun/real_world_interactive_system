@@ -154,7 +154,7 @@ class _RoleDiceState extends State<RoleDiceView>
                     setState(() {
                       loser.numberOfSips += penalty;
                       gameEvents.add(
-                          "${loser.name} drinks $penalty times as a result of the duel!");
+                          "${loser.name} DRINK $penalty times!");
                       duelInProgress = false;
                       updateDrinkingStatus(); // Update roles after duel
                     });
@@ -170,14 +170,14 @@ class _RoleDiceState extends State<RoleDiceView>
             Player previousPlayer = widget.players[previousPlayerIndex];
             previousPlayer.numberOfSips++;
             eventMessage +=
-                " ${previousPlayer.name}, you drink as you are the previous player!";
+                " ${previousPlayer.name}, DRINK! ";
             updateDrinkingStatus();
           } else if (sum == 8) {
             retainTurn = true;
             for (var player in widget.players) {
               player.numberOfSips++;
             }
-            eventMessage += " Everyone drinks!";
+            eventMessage += " Everyone DRINKS!";
             updateDrinkingStatus(); // Update roles after everyone drinks
           } else if (sum == 9) {
             retainTurn = true;
@@ -186,7 +186,7 @@ class _RoleDiceState extends State<RoleDiceView>
             Player nextPlayer = widget.players[nextPlayerIndex];
             nextPlayer.numberOfSips++;
             eventMessage +=
-                " ${nextPlayer.name}, you drink as you are the next player!";
+                " ${nextPlayer.name}, DRINK!!";
             updateDrinkingStatus();
           }
 
@@ -507,15 +507,25 @@ class _RoleDiceState extends State<RoleDiceView>
                           ),
                         ],
                       ),
-                      child: Text(
-                        gameEvents[index],
-                        style: TextStyle(
-                          fontSize: 16,  // Font size for the event text
-                          fontWeight: FontWeight.bold,  // Bold text
-                          fontFamily: 'Arial',  // Change this to your desired font
-                          color: Colors.black,  // Text color
-                        ),
-                        textAlign: TextAlign.left,  // Align text to the left
+                      child: Row(
+                        children: [
+                          Text(
+                            textAlign: TextAlign.center,
+                            gameEvents[index],
+                            style: TextStyle(
+                              fontSize: 14,  // Font size for the event text
+                              fontWeight: FontWeight.bold,  // Bold text
+                              fontFamily: 'Lemon',  // Change this to your desired font
+                              color: Colors.black,  // Text color
+                            ),
+                          ),
+                          SizedBox(width: 8),  // Optional: adds spacing between the text and image
+                          Image.asset(
+                            'assets/images/beers.png',  // Replace with your image path
+                            width: 20,  // Adjust the size of the image
+                            height: 20, // Adjust the size of the image
+                          ),
+                        ],
                       ),
                     ),
                   );
