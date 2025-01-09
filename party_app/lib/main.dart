@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:party_app/shared/constants.dart';
 import 'package:party_app/ui/welcome_view.dart';
 
+
+
 void main() {
   runApp(const MyApp());
 }
@@ -126,3 +128,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+

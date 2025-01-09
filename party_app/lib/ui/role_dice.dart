@@ -15,6 +15,7 @@ class RoleDiceView extends StatefulWidget {
   State<RoleDiceView> createState() => _RoleDiceState();
 }
 
+
 class _RoleDiceState extends State<RoleDiceView>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
@@ -53,7 +54,7 @@ class _RoleDiceState extends State<RoleDiceView>
           sum = results[2];
 
           String eventMessage =
-              "${widget.players[currentPlayerIndex].name} rolled $die1Value and $die2Value (Sum: $sum).";
+              "";
 
           if (die1Value == 3 || die2Value == 3) {
             List<Player> knights =
@@ -63,15 +64,50 @@ class _RoleDiceState extends State<RoleDiceView>
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text(
-                    "Knights of 3, DRINK!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Lemon',
-                      color: Colors.black,
-                    ),
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centers the content of the Column
+                    crossAxisAlignment: CrossAxisAlignment.center, // Centers the content horizontally
+                    children: [
+                      Text(
+                        "Knights of 3",
+                        textAlign: TextAlign.center, // Center the first part of the text
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Lemon',
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/beers.png',
+                            height: 30,
+                            width: 30,
+                          ),
+                          SizedBox(width: 10), // Space between the image and text
+                          Text(
+                            "DRINK!",
+                            textAlign: TextAlign.center, // Center the second part of the text
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Lemon',
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(width: 10), // Space between the text and image
+                          Image.asset(
+                            'assets/images/beers.png',
+                            height: 30,
+                            width: 30,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                    ],
                   ),
                   content: Text(
                     "You rolled a 3!",
@@ -134,7 +170,7 @@ class _RoleDiceState extends State<RoleDiceView>
             previousPlayer.numberOfSips++;
             eventMessage +=
                 " ${previousPlayer.name}, you drink as you are the previous player!";
-            updateDrinkingStatus(); // Update roles after previous player drinks
+            updateDrinkingStatus();
           } else if (sum == 8) {
             retainTurn = true;
             for (var player in widget.players) {
@@ -172,12 +208,45 @@ class _RoleDiceState extends State<RoleDiceView>
               builder: (BuildContext context) {
                 TextEditingController ruleController = TextEditingController();
                 return AlertDialog(
-                  title: Text("New Rule Opportunity"),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centers the content of the Row
+                    children: [
+                      Image.asset(
+                        'assets/images/bell.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "New rule!",
+                        textAlign: TextAlign.center,  // Center the text
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Lemon',
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Image.asset(
+                        'assets/images/bell.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ],
+                  ),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          "${widget.players[ruleSetterIndex].name}, you can set new rule!",
+                          "${widget.players[ruleSetterIndex].name}, you made people drink three times in a row, make a new rule!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Arial',
+                          color: Colors.black,
+                        ),
                       ),
                       SizedBox(height: 10),
                       TextField(
@@ -465,5 +534,7 @@ class _RoleDiceState extends State<RoleDiceView>
   }
 
 }
+
+
 
 

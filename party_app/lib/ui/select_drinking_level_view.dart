@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:party_app/shared/constants.dart';
 import 'package:party_app/shared/utils.dart';
 import 'package:party_app/ui/role_dice.dart';
-
+import 'package:party_app/ui/rules_view.dart';
 import '../entities/player.dart';
 
 class SelectDrinkingLevelView extends StatefulWidget {
@@ -176,51 +176,72 @@ class _SelectDrinkingLevelState extends State<SelectDrinkingLevelView> {
 
   // Next and Back buttons
   Widget buildNextAndBackButtons(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center, // Center both buttons
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center, // Center both buttons
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Back",
+                style: TextStyle(
+                  fontFamily: 'SofadiOne',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ),
-          ),
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            "Back",
-            style: TextStyle(
-              fontFamily: 'SofadiOne',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+            SizedBox(width: 30), // Adjust spacing between buttons
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RoleDiceView(players: widget.currentPlayers),
+                ),
+              ),
+              child: Text(
+                "Start Game",
+                style: TextStyle(
+                  fontFamily: 'SofadiOne',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-        SizedBox(width: 30), // Adjust spacing between buttons
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RoleDiceView(players: widget.currentPlayers),
-            ),
-          ),
-          child: Text(
-            "Start Game",
-            style: TextStyle(
-              fontFamily: 'SofadiOne',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+        SizedBox(height: 20), // Add spacing between the row and the image button
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RulesView(), //
+              ),
+            );
+          },
+          child: Image.asset(
+            'assets/images/information.png', // Replace with the path to your image
+            height: 40,
+            width: 40,
           ),
         ),
       ],
