@@ -204,31 +204,29 @@ class _RoleDiceState extends State<RoleDiceView>
 
   void updateDrinkingStatus() {
     if (widget.players.isNotEmpty) {
-      int maxSips = widget.players
-          .map((p) => p.numberOfSips)
-          .reduce((a, b) => a > b ? a : b);
-      int minSips = widget.players
-          .map((p) => p.numberOfSips)
-          .reduce((a, b) => a < b ? a : b);
+      // Determine the highest and lowest number of sips
+      int maxSips = widget.players.map((p) => p.numberOfSips).reduce((a, b) => a > b ? a : b);
+      int minSips = widget.players.map((p) => p.numberOfSips).reduce((a, b) => a < b ? a : b);
 
-      List<Player> mostDrunk =
-          widget.players.where((p) => p.numberOfSips == maxSips).toList();
-      List<Player> leastDrunk =
-          widget.players.where((p) => p.numberOfSips == minSips).toList();
+      // Find players with the highest and lowest sips
+      List<Player> mostDrunk = widget.players.where((p) => p.numberOfSips == maxSips).toList();
+      List<Player> leastDrunk = widget.players.where((p) => p.numberOfSips == minSips).toList();
 
+      // Assign roles based on the rules
       if (mostDrunk.length == 1) {
-        houseElf = mostDrunk.first.name;
+        kingOfTheCastle = mostDrunk.first.name; // Only one King of the Castle
       } else {
-        houseElf = "";
+        kingOfTheCastle = ""; // No King of the Castle if there's a tie
       }
 
       if (leastDrunk.length == 1) {
-        kingOfTheCastle = leastDrunk.first.name;
+        houseElf = leastDrunk.first.name; // Only one House Elf
       } else {
-        kingOfTheCastle = "";
+        houseElf = ""; // No House Elf if there's a tie
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -285,17 +283,7 @@ class _RoleDiceState extends State<RoleDiceView>
               endIndent: Utils.getWidth(context) * 0.1, // Right spacing
             ),
             SizedBox(height: Utils.getHeight(context) * 0.02),
-            Text(
-              widget.players
-                  .map((player) =>
-                      "${player.name}: ${player.numberOfSips} sips${player.name == kingOfTheCastle ? " (King of the Castle)" : player.name == houseElf ? " (House Elf)" : ""}")
-                  .join(" | "),
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[700],
-              ),
-              textAlign: TextAlign.center,
-            ),
+
             if (currentRules.isNotEmpty) ...[
               SizedBox(height: Utils.getHeight(context) * 0.01),
               Column(
@@ -352,23 +340,48 @@ class _RoleDiceState extends State<RoleDiceView>
               spacing: 8.0,
               runSpacing: 8.0,
               children: widget.players.map((player) {
-                return Row(
+                bool isKingOfCastle = player.name == kingOfTheCastle;
+                bool isHouseElf = player.name == houseElf;
+
+                return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage(
-                          player.characterImage),
-                    ),
-                    Text(
-                      '${player.numberOfSips}',
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    // Display King's picture if the player is the King of the Castle
+                    if (isKingOfCastle)
+                      Image.asset(
+                        'assets/images/kingofthecastle.png', // Replace with your King's image
+                        height: 40,
+                        width: 40,
+                      ),
+                    // Display House Elf's picture if the player is the House Elf
+                    if (isHouseElf)
+                      Image.asset(
+                        'assets/images/houseofelf.png', // Replace with your House Elf's image
+                        height: 40,
+                        width: 40,
+                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundImage: AssetImage(player.characterImage),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          '${player.numberOfSips}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 );
               }).toList(),
             ),
+
             Expanded(
               child: ListView.builder(
                 itemCount: gameEvents.length,
