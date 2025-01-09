@@ -59,13 +59,40 @@ class _RoleDiceState extends State<RoleDiceView>
             List<Player> knights =
                 widget.players.where((player) => player.isKnightOf3).toList();
 
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(
+                    "Knights of 3, DRINK!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Lemon',
+                      color: Colors.black,
+                    ),
+                  ),
+                  content: Text(
+                    "You rolled a 3!",
+                    textAlign: TextAlign.center,
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: Text("OK"),
+                    ),
+                  ],
+                );
+              },
+            );
+
             if (knights.isNotEmpty) {
               for (var knight in knights) {
                 knight.numberOfSips++;
               }
-              eventMessage +=
-                  " Knights of 3 (${knights.map((knight) => knight.name).join(", ")}) drink!";
-              updateDrinkingStatus();
             }
           }
 
@@ -150,7 +177,8 @@ class _RoleDiceState extends State<RoleDiceView>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          "${widget.players[ruleSetterIndex].name} has rolled 3 drink-makers in a row and can set a new rule!"),
+                          "${widget.players[ruleSetterIndex].name}, you can set new rule!",
+                      ),
                       SizedBox(height: 10),
                       TextField(
                         controller: ruleController,
@@ -300,7 +328,8 @@ class _RoleDiceState extends State<RoleDiceView>
                     .toList(),
               ),
             ],
-            SizedBox(height: Utils.getHeight(context) * 0.2),
+            SizedBox(height: 80),
+
             GestureDetector(
               onTap: () => _controller.forward(),
               child: Row(
@@ -313,7 +342,7 @@ class _RoleDiceState extends State<RoleDiceView>
                         angle: _animation.value * 2 * pi,
                         child: Image.asset(
                           'assets/images/die_$die1Value.png',
-                          height: 100,
+                          height: 120,
                         ),
                       );
                     },
@@ -326,7 +355,7 @@ class _RoleDiceState extends State<RoleDiceView>
                         angle: _animation.value * 2 * pi,
                         child: Image.asset(
                           'assets/images/die_$die2Value.png',
-                          height: 100,
+                          height: 120,
                         ),
                       );
                     },
@@ -393,15 +422,36 @@ class _RoleDiceState extends State<RoleDiceView>
                 itemCount: gameEvents.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text(
-                      gameEvents[index],
-                      style: TextStyle(fontSize: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),  // Adjust margins
+                    child: Container(
+                      padding: EdgeInsets.all(10),  // Adjust internal padding
+                      decoration: BoxDecoration(
+                        color: Colors.white,  // Background color for each event
+                        borderRadius: BorderRadius.circular(8),  // Rounded corners for each event
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 4,
+                            offset: Offset(0, 2), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        gameEvents[index],
+                        style: TextStyle(
+                          fontSize: 16,  // Font size for the event text
+                          fontWeight: FontWeight.bold,  // Bold text
+                          fontFamily: 'Arial',  // Change this to your desired font
+                          color: Colors.black,  // Text color
+                        ),
+                        textAlign: TextAlign.left,  // Align text to the left
+                      ),
                     ),
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
