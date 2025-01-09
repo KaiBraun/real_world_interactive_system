@@ -448,7 +448,7 @@ class _RoleDiceState extends State<RoleDiceView>
                     // Display King's picture if the player is the King of the Castle
                     if (isKingOfCastle)
                       Padding(
-                        padding: EdgeInsets.only(right: 16),  // Adjust this value to move it left or right
+                        padding: EdgeInsets.only(right: 14),  // Adjust this value to move it left or right
                         child: Image.asset(
                           'assets/images/kingofthecastle.png',  // Your King image path
                           height: 40,
@@ -458,7 +458,7 @@ class _RoleDiceState extends State<RoleDiceView>
                     // Display House Elf's picture if the player is the House Elf
                     if (isHouseElf)
                     Padding(
-                    padding: EdgeInsets.only(right: 16),  // Adjust this value to move it left or right
+                    padding: EdgeInsets.only(right: 14),  // Adjust this value to move it left or right
                     child: Image.asset(
                     'assets/images/houseofelf.png',  // Your King image path
                     height: 40,
@@ -508,9 +508,10 @@ class _RoleDiceState extends State<RoleDiceView>
                         ],
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,  // Centers the Row horizontally
+                        crossAxisAlignment: CrossAxisAlignment.center,  // Centers the Row vertically
                         children: [
                           Text(
-                            textAlign: TextAlign.center,
                             gameEvents[index],
                             style: TextStyle(
                               fontSize: 14,  // Font size for the event text
