@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import '../application_logic/game_logic.dart';
 import '../entities/player.dart';
 import '../shared/constants.dart';
 import '../shared/utils.dart';
@@ -29,7 +30,7 @@ class DuelView extends StatefulWidget {
   State<DuelView> createState() => _DuelViewState();
 }
 
-class _DuelViewState extends State<DuelView> {
+class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin {
   late Player currentAttacker; // The player initiating the counterattack.
   late Player currentDefender; // The player deciding whether to counterattack.
   int doubleChain = 0; // Accumulated penalty from doubles.
@@ -42,17 +43,74 @@ class _DuelViewState extends State<DuelView> {
   String message =
       "Choose your rival for the duel!"; // Message displayed to the user.
 
+  late AnimationController _controller;
+  late CurvedAnimation _animation;
+  int die1 = 1;
+  int die2 = 1;
+
   @override
   void initState() {
     super.initState();
-    currentAttacker =
-        widget.currentPlayer; // The initiator starts as the attacker.
+    currentAttacker = widget.currentPlayer;
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.bounceInOut,
+    );
   }
 
   // Rolls dice for a counterattack attempt.
   void rollDiceForCounterattack() {
-    int die1 = random.nextInt(6) + 1; // Random number for die 1 (1 to 6).
-    int die2 = random.nextInt(6) + 1; // Random number for die 2 (1 to 6).
+    _controller.forward();
+
+    _controller.addListener(() {
+
+      setState(() {
+        if (_controller.isCompleted) {
+          List<int> results = rollDice();
+
+          die1 = results[0];
+          die2 = results[1];
+          bool isDouble = die1 == die2;
+
+          if (isDouble) {
+            // If doubles are rolled, add the die value to the penalty chain.
+            doubleChain += die1;
+
+            // Swap roles: current defender becomes attacker, attacker becomes defender.
+            Player temp = currentAttacker;
+            currentAttacker = currentDefender;
+            currentDefender = temp;
+
+            // Return to counterattack decision phase for the new defender.
+            isCounterattackPhase = true;
+            message =
+            "${currentDefender
+                .name}, doubles rolled! Do you accept your fate or counterattack? (Current penalty: $doubleChain sips)";
+          } else {
+            // If doubles are not rolled, calculate the penalty.
+            penalty = doubleChain +
+                min(die1, die2); // Add smallest die value to the chain.
+            message =
+            "${currentDefender
+                .name} failed to roll doubles! Penalty: $penalty sips.";
+            endDuel();
+          }
+        }
+      });
+    });
+
+    /*
+    List<int> results = rollDice();
+
+    int die1 = results[0];
+    int die2 = results[1];
+
     bool isDouble = die1 == die2; // Checks if the roll is a double.
 
     setState(() {
@@ -79,27 +137,7 @@ class _DuelViewState extends State<DuelView> {
             .name} failed to roll doubles! Penalty: $penalty sips.";
         endDuel();
       }
-    });
-  }
-
-  // Called when the defender accepts the penalty and does not counterattack.
-  void acceptFate() {
-    setState(() {
-      // Apply the accumulated penalty (or initial value if no doubles).
-      penalty = doubleChain > 0 ? doubleChain : widget.triggeringValue;
-      message =
-      "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
-      endDuel();
-    });
-  }
-
-  // Ends the duel and notifies the parent widget.
-  void endDuel() {
-    Future.delayed(Duration(seconds: 2), () {
-      widget.onDuelComplete(
-          penalty, currentDefender); // Notify about the result.
-      Navigator.pop(context); // Close the DuelView.
-    });
+    }); */
   }
 
   @override
@@ -151,16 +189,64 @@ class _DuelViewState extends State<DuelView> {
   Column buildCounterattackPhaseView() {
     return Column(
       children: [
+        SizedBox(height: Utils.getHeight(context) * 0.05),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 75,
+              height: 75,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage(currentDefender.characterImage),
+                  // Displaying the character image
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(width: 20),
+            Flexible(
+                child: Text(
+                  currentDefender.name,
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                )
+            )
+          ],
+        ),
+        SizedBox(height: Utils.getHeight(context) * 0.05),
         GestureDetector(
-          onTap: rollDiceForCounterattack, // Handles the dice roll when tapped.
+          onTap: rollDiceForCounterattack,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/die_${random.nextInt(6) + 1}.png',
-                  height: 100),
-              SizedBox(width: 20), // Spacing between dice.
-              Image.asset('assets/images/die_${random.nextInt(6) + 1}.png',
-                  height: 100),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _animation.value * 2 * pi,
+                    child: Image.asset(
+                      'assets/images/die_$die1.png',
+                      height: 120,
+                    ),
+                  );
+                },
+              ),
+              SizedBox(width: 20),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _animation.value * 2 * pi,
+                    child: Image.asset(
+                      'assets/images/die_$die2.png',
+                      height: 120,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -296,4 +382,26 @@ class _DuelViewState extends State<DuelView> {
       ),
     );
   }
+
+
+  // Called when the defender accepts the penalty and does not counterattack.
+  void acceptFate() {
+    setState(() {
+      // Apply the accumulated penalty (or initial value if no doubles).
+      penalty = doubleChain > 0 ? doubleChain : widget.triggeringValue;
+      message =
+      "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
+      endDuel();
+    });
+  }
+
+  // Ends the duel and notifies the parent widget.
+  void endDuel() {
+    Future.delayed(Duration(seconds: 2), () {
+      widget.onDuelComplete(
+          penalty, currentDefender); // Notify about the result.
+      Navigator.pop(context); // Close the DuelView.
+    });
+  }
+
 }
