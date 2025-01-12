@@ -6,7 +6,7 @@ import 'package:party_app/shared/utils.dart';
 import 'package:party_app/ui/select_drinking_level_view.dart';
 
 class AddPlayersView extends StatefulWidget {
-  List<Player> currentPlayers =[];
+  List<Player> currentPlayers = [];
 
   @override
   _AddPlayersViewState createState() => _AddPlayersViewState();
@@ -28,9 +28,7 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     'assets/images/Characters/Character8.png',
   ];
 
-
   List<String> usedCharacterImages = [];
-
 
   String getRandomCharacterImage() {
     final availableImages = characterImages
@@ -42,7 +40,8 @@ class _AddPlayersViewState extends State<AddPlayersView> {
     }
 
     final random = Random();
-    final selectedImage = availableImages[random.nextInt(availableImages.length)];
+    final selectedImage =
+        availableImages[random.nextInt(availableImages.length)];
     usedCharacterImages.add(selectedImage);
     return selectedImage;
   }
@@ -58,77 +57,13 @@ class _AddPlayersViewState extends State<AddPlayersView> {
           child: Align(
             alignment: Alignment.center,
             child: Container(
-              width: 300,
+              width: Utils.getWidth(context) * 0.85,
               child: Column(
                 children: [
                   SizedBox(height: Utils.getHeight(context) * 0.1),
-                  Container(
-                    height: 200,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Insert the',
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Lemon',
-                                    color: Colors.black,
-                                    height: 1,
-                                  ),
-                                ),
-                                Text(
-                                  'players',
-                                  style: TextStyle(
-                                    fontSize: 46,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Lemon',
-                                    color: Colors.black,
-                                    height: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(width: 10),
-                            Transform.translate(
-                              offset: Offset(0, -5),
-                              child: Image.asset(
-                                'assets/images/insertplayers2.png',
-                                width: 80,
-                                height: 80,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Apply offset to the scrolling list
-                  Transform.translate(
-                    offset: Offset(0, -30), // Move the list up by 30 pixels
-                    child: Container(
-                      height: 400,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,  // Attach ScrollController here
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
-                            children: List.generate(
-                              widget.currentPlayers.length,
-                                  (index) => buildPlayerCard(widget.currentPlayers[index]),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  buildTitleBanner(),
+                  SizedBox(height: Utils.getHeight(context) * 0.05),
+                  buildPlayerListView(context),
                   // If less than 8 players, show the input field and add button
                   if (widget.currentPlayers.length < 8) buildAddPlayerFields(),
                   buildNextButton(),
@@ -138,6 +73,70 @@ class _AddPlayersViewState extends State<AddPlayersView> {
           ),
         ),
       ),
+    );
+  }
+
+  Container buildPlayerListView(BuildContext context) {
+    return Container(
+                  height: Utils.getHeight(context) * 0.5 -
+                      MediaQuery.of(context).viewInsets.bottom / 2,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    // Attach ScrollController here
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      child: Column(
+                        children: List.generate(
+                          widget.currentPlayers.length,
+                          (index) =>
+                              buildPlayerCard(widget.currentPlayers[index]),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+  }
+
+  Row buildTitleBanner() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Insert the',
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Lemon',
+                color: Colors.black,
+                height: 1,
+              ),
+            ),
+            Text(
+              'players',
+              style: TextStyle(
+                fontSize: 46,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Lemon',
+                color: Colors.black,
+                height: 1,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(width: 10),
+        Transform.translate(
+          offset: Offset(0, -5),
+          child: Image.asset(
+            'assets/images/insertplayers2.png',
+            width: 80,
+            height: 80,
+          ),
+        ),
+      ],
     );
   }
 
@@ -263,7 +262,8 @@ class _AddPlayersViewState extends State<AddPlayersView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SelectDrinkingLevelView(currentPlayers: widget.currentPlayers),
+                    builder: (context) => SelectDrinkingLevelView(
+                        currentPlayers: widget.currentPlayers),
                   ),
                 );
               }
