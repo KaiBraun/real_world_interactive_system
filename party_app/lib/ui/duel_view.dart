@@ -10,11 +10,11 @@ class DuelView extends StatefulWidget {
   final Player currentPlayer; // The player who initiated the duel.
   final List<Player> players; // List of all players in the game.
   final Function(int penalty, Player loser)
-  onDuelComplete; // Callback when the duel is over.
+      onDuelComplete; // Callback when the duel is over.
   final String die1Image; // Path to the image of the first die.
   final String die2Image; // Path to the image of the second die.
   final int
-  triggeringValue; // The value of the dice pair that initiated the duel.
+      triggeringValue; // The value of the dice pair that initiated the duel.
 
   const DuelView({
     super.key,
@@ -30,16 +30,17 @@ class DuelView extends StatefulWidget {
   State<DuelView> createState() => _DuelViewState();
 }
 
-class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin {
+class _DuelViewState extends State<DuelView>
+    with SingleTickerProviderStateMixin {
   late Player currentAttacker; // The player initiating the counterattack.
   late Player currentDefender; // The player deciding whether to counterattack.
   int doubleChain = 0; // Accumulated penalty from doubles.
   int penalty = 0; // Final penalty applied to the losing player.
   Random random = Random(); // Random number generator for dice rolls.
   bool isChoosingRival =
-  true; // Whether the current phase is selecting the rival.
+      true; // Whether the current phase is selecting the rival.
   bool isCounterattackPhase =
-  false; // Whether it's the counterattack decision phase.
+      false; // Whether it's the counterattack decision phase.
   String message =
       "Choose your rival for the duel!"; // Message displayed to the user.
 
@@ -62,23 +63,24 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
       parent: _controller,
       curve: Curves.bounceInOut,
     );
-  }
-
-  // Rolls dice for a counterattack attempt.
-  void rollDiceForCounterattack() {
-    _controller.forward();
 
     _controller.addListener(() {
+      onCounterAttackDiceThrown();
+    });
+  }
 
+  void onCounterAttackDiceThrown() {
+    if (_controller.isCompleted) {
       setState(() {
-        if (_controller.isCompleted) {
-          List<int> results = rollDice();
+        List<int> results = rollDice();
 
-          die1 = results[0];
-          die2 = results[1];
-          bool isDouble = die1 == die2;
+        die1 = results[0];
+        die2 = results[1];
+      });
 
-          if (isDouble) {
+      Future.delayed(const Duration(seconds: 1), () {
+        setState(() {
+          if (die1 == die2) {
             // If doubles are rolled, add the die value to the penalty chain.
             doubleChain += die1;
 
@@ -89,55 +91,19 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
 
             // Return to counterattack decision phase for the new defender.
             isCounterattackPhase = true;
-            message =
-            "${currentDefender
-                .name}, doubles rolled! Do you accept your fate or counterattack? (Current penalty: $doubleChain sips)";
+            message = "${currentAttacker.name} rolled doubles!!";
+            _controller.reset();
           } else {
             // If doubles are not rolled, calculate the penalty.
             penalty = doubleChain +
                 min(die1, die2); // Add smallest die value to the chain.
             message =
-            "${currentDefender
-                .name} failed to roll doubles! Penalty: $penalty sips.";
+            "${currentDefender.name} failed to roll doubles! Penalty: $penalty sips.";
             endDuel();
           }
-        }
+        });
       });
-    });
-
-    /*
-    List<int> results = rollDice();
-
-    int die1 = results[0];
-    int die2 = results[1];
-
-    bool isDouble = die1 == die2; // Checks if the roll is a double.
-
-    setState(() {
-      if (isDouble) {
-        // If doubles are rolled, add the die value to the penalty chain.
-        doubleChain += die1;
-
-        // Swap roles: current defender becomes attacker, attacker becomes defender.
-        Player temp = currentAttacker;
-        currentAttacker = currentDefender;
-        currentDefender = temp;
-
-        // Return to counterattack decision phase for the new defender.
-        isCounterattackPhase = true;
-        message =
-        "${currentDefender
-            .name}, doubles rolled! Do you accept your fate or counterattack? (Current penalty: $doubleChain sips)";
-      } else {
-        // If doubles are not rolled, calculate the penalty.
-        penalty = doubleChain +
-            min(die1, die2); // Add smallest die value to the chain.
-        message =
-        "${currentDefender
-            .name} failed to roll doubles! Penalty: $penalty sips.";
-        endDuel();
-      }
-    }); */
+    }
   }
 
   @override
@@ -208,17 +174,19 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
             SizedBox(width: 20),
             Flexible(
                 child: Text(
-                  currentDefender.name,
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,color: Colors.white),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                )
-            )
+              currentDefender.name,
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ))
           ],
         ),
         SizedBox(height: Utils.getHeight(context) * 0.05),
         GestureDetector(
-          onTap: rollDiceForCounterattack,
+          onTap: ()=>_controller.forward(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -285,18 +253,25 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
               SizedBox(width: 20),
               Flexible(
                   child: Text(
-                    currentDefender.name,
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,color: Colors.white),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  )
-              )
+                currentDefender.name,
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ))
             ],
           ),
-          AutoSizeText("Do you accept your fate or counterattack?",
-            style: TextStyle(color: Colors.white), maxFontSize: 20,),
-          Text("(Initial penalty: $doubleChain sips)",
-            style: TextStyle(color: Colors.white),),
+          AutoSizeText(
+            "Do you accept your fate or counterattack?",
+            style: TextStyle(color: Colors.white),
+            maxFontSize: 20,
+          ),
+          Text(
+            "(Penalty: $doubleChain sips)",
+            style: TextStyle(color: Colors.white),
+          ),
           SizedBox(height: Utils.getHeight(context) * 0.05),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -311,10 +286,9 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
                 onPressed: () {
                   setState(() {
                     message =
-                    "${currentDefender
-                        .name}, roll the dice to defend your honor!";
+                        "${currentDefender.name}, roll the dice to defend your honor!";
                     isCounterattackPhase =
-                    false; // Move to the dice-rolling phase.
+                        false; // Move to the dice-rolling phase.
                   });
                 },
                 child: Text("Counterattack"),
@@ -371,18 +345,15 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
                       isCounterattackPhase = true;
                       doubleChain = widget
                           .triggeringValue; // Initialize penalty with triggering value.
-                      message =
-                      "What do you do?";
+                      message = "What do you do?";
                     });
                   },
-                )
-            ),
+                )),
           );
         },
       ),
     );
   }
-
 
   // Called when the defender accepts the penalty and does not counterattack.
   void acceptFate() {
@@ -390,7 +361,7 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
       // Apply the accumulated penalty (or initial value if no doubles).
       penalty = doubleChain > 0 ? doubleChain : widget.triggeringValue;
       message =
-      "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
+          "${currentDefender.name} accepts their fate! Penalty: $penalty sips.";
       endDuel();
     });
   }
@@ -403,5 +374,4 @@ class _DuelViewState extends State<DuelView> with SingleTickerProviderStateMixin
       Navigator.pop(context); // Close the DuelView.
     });
   }
-
 }
