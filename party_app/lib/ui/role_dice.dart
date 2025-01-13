@@ -312,13 +312,13 @@ class _RoleDiceState extends State<RoleDiceView>
 
       // Assign roles based on the rules
       if (mostDrunk.length == 1) {
-        kingOfTheCastle = mostDrunk.first.name; // Only one King of the Castle
+        kingOfTheCastle = leastDrunk.first.name; // Only one King of the Castle
       } else {
         kingOfTheCastle = ""; // No King of the Castle if there's a tie
       }
 
       if (leastDrunk.length == 1) {
-        houseElf = leastDrunk.first.name; // Only one House Elf
+        houseElf = mostDrunk.first.name; // Only one House Elf
       } else {
         houseElf = ""; // No House Elf if there's a tie
       }

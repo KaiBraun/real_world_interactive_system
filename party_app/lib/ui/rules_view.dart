@@ -5,8 +5,8 @@ class RulesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> rules = [
       "The Knights of 3 have to drink every time a player rolls the number 3!",
-      "The House Elf is the player who has drunk less and bla bla bla...",
-      "The King of the castle is the player who has drunk more and...",
+      "The House Elf is the player who has drunk the most. He cannot look anyone in the eye",
+      "The King of the castle is the player who has drunk least no one is allowed to look him in the eyes",
       "Every time someone rolls a total sum of 7, the previous player has to drink, and the current player rolls the dice again.",
       "Every time someone rolls a total sum of 8, everyone has to drink, and the current player rolls the dice again.",
       "Every time someone rolls a total sum of 9, the previous player has to drink, and the current player rolls the dice again.",
